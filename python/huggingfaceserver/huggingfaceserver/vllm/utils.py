@@ -54,10 +54,34 @@ def infer_vllm_supported_from_model_architecture(
 def maybe_add_vllm_cli_parser(parser: ArgumentParser) -> ArgumentParser:
     if not _vllm:
         return parser
-    return AsyncEngineArgs.add_cli_args(parser)
+    parser = AsyncEngineArgs.add_cli_args(parser)
+    
+    # Add speculative model arguments
+    parser.add_argument(
+        "--speculative-model",
+        type=str,
+        help="Path to the speculative (draft) model for speculative decoding",
+        default=None,
+    )
+    parser.add_argument(
+        "--speculative-model-revision",
+        type=str,
+        help="Revision of the speculative model",
+        default=None,
+    )
+    
+    return parser
 
 
 def build_vllm_engine_args(args) -> "AsyncEngineArgs":
     if not _vllm:
         return None
-    return AsyncEngineArgs.from_cli_args(args)
+    engine_args = AsyncEngineArgs.from_cli_args(args)
+    
+    # Add speculative model if specified
+    if hasattr(args, "speculative_model"):
+        engine_args.speculative_model = args.speculative_model
+    if hasattr(args, "speculative_model_revision"):
+        engine_args.speculative_model_revision = args.speculative_model_revision
+    
+    return engine_args
