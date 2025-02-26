@@ -9,3 +9,6 @@ test: type_check
 
 type_check:
 	mypy --ignore-missing-imports huggingfaceserver 
+
+test_speculative:
+	python3 -m huggingfaceserver --speculative-model "path/to/speculative/model" --speculative-model-revision "v1.0"

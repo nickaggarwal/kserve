@@ -69,6 +69,12 @@ def maybe_add_vllm_cli_parser(parser: ArgumentParser) -> ArgumentParser:
         help="Revision of the speculative model",
         default=None,
     )
+    parser.add_argument(
+        "--num-speculative-tokens",
+        type=int,
+        help="Number of speculative tokens to use for speculative decoding",
+        default=None,
+    )
     
     return parser
 
@@ -83,5 +89,7 @@ def build_vllm_engine_args(args) -> "AsyncEngineArgs":
         engine_args.speculative_model = args.speculative_model
     if hasattr(args, "speculative_model_revision"):
         engine_args.speculative_model_revision = args.speculative_model_revision
+    if hasattr(args, "num_speculative_tokens"):
+        engine_args.num_speculative_tokens = args.num_speculative_tokens
     
     return engine_args
