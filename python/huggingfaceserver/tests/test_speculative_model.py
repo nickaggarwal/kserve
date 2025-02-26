@@ -11,6 +11,7 @@ class DummyAsyncEngineArgs:
     def __init__(self):
         self.speculative_model = None
         self.speculative_model_revision = None
+        self.num_speculative_tokens = None
 
     @classmethod
     def add_cli_args(cls, parser):
@@ -42,20 +43,27 @@ class TestSpeculativeModelArguments(unittest.TestCase):
 
         self.assertIsNone(engine_args.speculative_model, "Expected speculative_model to be None by default")
         self.assertIsNone(engine_args.speculative_model_revision, "Expected speculative_model_revision to be None by default")
+        self.assertIsNone(engine_args.num_speculative_tokens, "Expected num_speculative_tokens to be None by default")
 
     def test_with_speculative_model_arguments(self):
         # Test that providing speculative model arguments sets them in engine args
         test_model = "path/to/speculative/model"
         test_revision = "v1.0"
+        test_num_tokens = 10
         parser = argparse.ArgumentParser()
         parser = utils.maybe_add_vllm_cli_parser(parser)
 
         # Simulate providing command-line arguments
-        args = parser.parse_args(["--speculative-model", test_model, "--speculative-model-revision", test_revision])
+        args = parser.parse_args([
+            "--speculative-model", test_model,
+            "--speculative-model-revision", test_revision,
+            "--num-speculative-tokens", str(test_num_tokens)
+        ])
         engine_args = utils.build_vllm_engine_args(args)
 
         self.assertEqual(engine_args.speculative_model, test_model, "speculative_model should match the given value")
         self.assertEqual(engine_args.speculative_model_revision, test_revision, "speculative_model_revision should match the given value")
+        self.assertEqual(engine_args.num_speculative_tokens, test_num_tokens, "num_speculative_tokens should match the given value")
 
 
 if __name__ == '__main__':
